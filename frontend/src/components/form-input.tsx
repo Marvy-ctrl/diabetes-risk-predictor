@@ -22,7 +22,20 @@ import {
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import React, { useState } from "react";
-import { Loader2, CheckCircle2, AlertCircle, Info } from "lucide-react";
+import {
+  Loader2,
+  CheckCircle2,
+  AlertCircle,
+  Info,
+  InfoIcon,
+} from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import ResultPDF from "./pdf";
+import { PDFDownloadLink } from "@react-pdf/renderer";
 
 const formSchema = z.object({
   Gender: z.enum(["male", "female"]),
@@ -43,6 +56,7 @@ type PredictionResult = {
   status: string;
   prediction: number;
   message: string;
+  confidence: string;
 };
 
 export default function FormInput() {
@@ -58,8 +72,8 @@ export default function FormInput() {
       Glucose: 0,
       Weight: 0,
       Height: 0,
-      BloodPressure: 0,
       SkinThickness: 0,
+      BloodPressure: 0,
       Insulin: 0,
       Age: 0,
     },
@@ -263,16 +277,25 @@ export default function FormInput() {
                 name="SkinThickness"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="font-semibold text-gray-700">
+                    <FormLabel className="font-semibold text-gray-700 ">
                       Skin Thickness (mm)
                     </FormLabel>
                     <FormControl>
-                      <Input
-                        type="number"
-                        placeholder="e.g., 20"
-                        className="border-gray-300 focus:border-blue-500"
-                        {...field}
-                      />
+                      <Select
+                        onValueChange={(value) => field.onChange(Number(value))}
+                        value={String(field.value ?? "")}
+                      >
+                        <SelectTrigger className="w-full border-gray-300 focus:border-blue-500">
+                          <SelectValue placeholder="Select skin thickness" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="15">Slim (10–20 mm)</SelectItem>
+                          <SelectItem value="25">Average (20–30 mm)</SelectItem>
+                          <SelectItem value="40">
+                            Overweight (35–50 mm)
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -317,13 +340,22 @@ export default function FormInput() {
                 name="BloodPressure"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="font-semibold text-gray-700">
-                      Blood Pressure (mm Hg)
+                    <FormLabel className="font-semibold text-gray-700 flex items-center gap-1">
+                      Diastolic Blood Pressure (mm Hg)
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Info className="w-4 h-4 text-gray-400 cursor-pointer" />
+                        </TooltipTrigger>
+                        <TooltipContent className="text-sm">
+                          Enter the bottom number (diastolic) of your blood
+                          pressure reading. Example: in 120/80 mmHg, type 80.
+                        </TooltipContent>
+                      </Tooltip>
                     </FormLabel>
                     <FormControl>
                       <Input
                         type="number"
-                        placeholder="e.g., 80"
+                        placeholder="Diastolic (bottom number), e.g., 80"
                         className="border-gray-300 focus:border-blue-500"
                         {...field}
                       />
@@ -339,6 +371,15 @@ export default function FormInput() {
                   <FormItem>
                     <FormLabel className="font-semibold text-gray-700">
                       Insulin Level (μU/mL)
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Info className="w-4 h-4 text-gray-400 cursor-pointer" />
+                        </TooltipTrigger>
+                        <TooltipContent className="text-sm">
+                          If you don't know your insulin level, enter a typical
+                          adult average (~85 μU/mL).
+                        </TooltipContent>
+                      </Tooltip>
                     </FormLabel>
                     <FormControl>
                       <Input
@@ -348,6 +389,7 @@ export default function FormInput() {
                         {...field}
                       />
                     </FormControl>
+
                     <FormMessage />
                   </FormItem>
                 )}
@@ -494,21 +536,76 @@ export default function FormInput() {
                     : "text-green-800"
                 }`}
               >
-                <p className="text-base mb-3">
-                  Result: <strong>{result.message}</strong>
+                <p className="text-base mb-3 font-semibold">
+                  Result: <strong>{result.message}</strong> (Confidence Level:{" "}
+                  {result.confidence})
                 </p>
                 {result.message === "Diabetic" ? (
-                  <p className="text-sm">
+                  <div className="text-sm">
                     This assessment indicates a higher risk of diabetes. We
                     strongly recommend consulting with a healthcare professional
                     for proper evaluation and guidance.
-                  </p>
+                    <span>
+                      {result && (
+                        <div className="mt-4">
+                          <PDFDownloadLink
+                            document={
+                              <ResultPDF
+                                values={form.getValues()}
+                                result={result}
+                              />
+                            }
+                            fileName="diabetes_risk_assessment.pdf"
+                            style={{
+                              padding: "10px 20px",
+                              border: "1px solid #D1D5DB",
+                              backgroundColor: "white",
+                              color: "black",
+                              borderRadius: "8px",
+                              textDecoration: "none",
+                              display: "inline-block",
+                            }}
+                          >
+                            {({ loading }) =>
+                              loading ? "Generating PDF..." : "Download PDF"
+                            }
+                          </PDFDownloadLink>
+                        </div>
+                      )}
+                    </span>
+                  </div>
                 ) : (
-                  <p className="text-sm">
+                  <div className="text-sm">
                     This assessment indicates a lower risk of diabetes. Continue
                     maintaining a healthy lifestyle and regular check-ups with
                     your healthcare provider.
-                  </p>
+                    {result && (
+                      <div className="mt-4">
+                        <PDFDownloadLink
+                          document={
+                            <ResultPDF
+                              values={form.getValues()}
+                              result={result}
+                            />
+                          }
+                          fileName="diabetes_risk_assessment.pdf"
+                          style={{
+                            padding: "10px 20px",
+                            border: "1px solid #D1D5DB",
+                            backgroundColor: "white",
+                            color: "black",
+                            borderRadius: "8px",
+                            textDecoration: "none",
+                            display: "inline-block",
+                          }}
+                        >
+                          {({ loading }) =>
+                            loading ? "Generating PDF..." : "Download PDF"
+                          }
+                        </PDFDownloadLink>
+                      </div>
+                    )}
+                  </div>
                 )}
               </AlertDescription>
             </Alert>

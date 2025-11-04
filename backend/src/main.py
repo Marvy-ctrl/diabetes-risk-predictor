@@ -113,8 +113,15 @@ def diabetes_prediction(input_data: UserInput):
 
     label = "Diabetic" if int(prediction[0]) == 1 else "Not Diabetic"
 
+    try:
+        probability = model.predict_proba(scaled_data)[0]
+        confidence = round(float(max(probability)) * 100, 2)
+    except AttributeError:
+        confidence = None
+
     return {
         "status": "success",
         "prediction": int(prediction[0]),
         "message": label,
+        "confidence": f"{confidence:.2f}%",
     }
