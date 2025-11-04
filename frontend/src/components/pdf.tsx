@@ -25,16 +25,36 @@ const pdfStyles = StyleSheet.create({
   field: { fontSize: 11, marginBottom: 5 },
 });
 
+interface FormValues {
+  Gender: string;
+  Pregnancies?: number;
+  Age: number;
+  Weight: number;
+  Height: number;
+  Glucose: number;
+  BloodPressure: number;
+  SkinThickness: number;
+  Insulin: number;
+  FamilyParents: string;
+  FamilySiblings: string;
+  FamilyGrandparents: string;
+}
+
+interface PredictionResult {
+  message: string;
+  confidence?: string | number;
+}
+
 interface ResultPDFProps {
-  values: any;
-  result: any;
+  values: FormValues;
+  result: PredictionResult;
 }
 
 const ResultPDF: React.FC<ResultPDFProps> = ({ values, result }) => (
   <Document>
     <Page size="A4" style={pdfStyles.page}>
       <View style={pdfStyles.heading}>
-        <Image src="frontend/public/activity.png" style={pdfStyles.logoIcon} />
+        {/* <Image src="frontend/public/activity.png" style={pdfStyles.logoIcon} /> */}
         <Text style={pdfStyles.appName}>GlucoSense</Text>
       </View>
       <Text style={pdfStyles.heading}>Diabetes Risk Assessment Report</Text>

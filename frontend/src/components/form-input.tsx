@@ -22,13 +22,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import React, { useState } from "react";
-import {
-  Loader2,
-  CheckCircle2,
-  AlertCircle,
-  Info,
-  InfoIcon,
-} from "lucide-react";
+import { Loader2, CheckCircle2, AlertCircle, Info } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -289,10 +283,10 @@ export default function FormInput() {
                           <SelectValue placeholder="Select skin thickness" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="15">Slim (10–20 mm)</SelectItem>
-                          <SelectItem value="25">Average (20–30 mm)</SelectItem>
+                          <SelectItem value="15">Slim (10-20 mm)</SelectItem>
+                          <SelectItem value="25">Average (20-30 mm)</SelectItem>
                           <SelectItem value="40">
-                            Overweight (35–50 mm)
+                            Overweight (35-50 mm)
                           </SelectItem>
                         </SelectContent>
                       </Select>
