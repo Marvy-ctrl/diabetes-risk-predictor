@@ -370,7 +370,7 @@ export default function FormInput() {
                           <Info className="w-4 h-4 text-gray-400 cursor-pointer" />
                         </TooltipTrigger>
                         <TooltipContent className="text-sm">
-                          If you don't know your insulin level, enter a typical
+                          If you do not know your insulin level, enter a typical
                           adult average (~85 μU/mL).
                         </TooltipContent>
                       </Tooltip>

@@ -1,14 +1,7 @@
 "use client";
 
 import React from "react";
-import {
-  Document,
-  Page,
-  Text,
-  View,
-  StyleSheet,
-  Image,
-} from "@react-pdf/renderer";
+import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 
 const pdfStyles = StyleSheet.create({
   page: { padding: 20, backgroundColor: "#f5f5f5" },
