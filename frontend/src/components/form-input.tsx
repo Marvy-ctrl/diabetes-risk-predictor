@@ -53,6 +53,54 @@ type PredictionResult = {
   confidence: string;
 };
 
+type ResultType = "Diabetic" | "Not Diabetic";
+
+interface Advice {
+  title: string;
+  diet: string[];
+  exercise: string[];
+  lifestyle: string[];
+}
+
+const healthAdvice: Record<ResultType, Advice> = {
+  Diabetic: {
+    title: "Health Advice for Diabetes Management",
+    diet: [
+      "Eat high fiber foods like vegetables and whole grains.",
+      "Avoid sugary drinks and limit carbs.",
+      "Control portion sizes and monitor blood sugar levels.",
+    ],
+    exercise: [
+      "Engage in light to moderate exercise daily, such as walking or swimming.",
+      "Avoid long sedentary periods move every 30 minutes.",
+      "Check blood sugar before and after intense workouts.",
+    ],
+    lifestyle: [
+      "Take medications as prescribed.",
+      "Track glucose regularly.",
+      "Get enough rest and reduce stress.",
+    ],
+  },
+  "Not Diabetic": {
+    title: "Health Advice for Low Diabetes Risk",
+    diet: [
+      "Maintain a balanced diet with plenty of vegetables, whole grains, and lean proteins.",
+      "Limit refined sugars and processed foods.",
+      "Stay hydrated aim for at least 8 cups of water daily.",
+    ],
+    exercise: [
+      "Engage in at least 30 minutes of physical activity most days of the week.",
+      "Incorporate strength training twice a week.",
+      "Take regular walks after meals to regulate blood sugar.",
+    ],
+    lifestyle: [
+      "Get 7-8 hours of sleep nightly.",
+      "Manage stress through mindfulness or meditation.",
+      "Avoid smoking and limit alcohol intake.",
+    ],
+  },
+};
+
 export default function FormInput() {
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<PredictionResult | null>(null);
@@ -561,11 +609,50 @@ export default function FormInput() {
                             }}
                           >
                             {({ loading }) =>
-                              loading ? "Generating PDF..." : "Download PDF"
+                              loading
+                                ? "Generating Report..."
+                                : "Download Report"
                             }
                           </PDFDownloadLink>
                         </div>
                       )}
+
+                      <div>
+                        {result && (
+                          <div className="mt-6 p-4  rounded-lg ">
+                            <h3 className="text-lg font-semibold mb-2">
+                              {healthAdvice[result.message].title}
+                            </h3>
+
+                            <h4 className="font-semibold mt-2">Diet</h4>
+                            <ul className="list-disc ml-5 text-sm text-gray-700">
+                              {healthAdvice[result.message].diet.map(
+                                (tip, i) => (
+                                  <li key={i}>{tip}</li>
+                                )
+                              )}
+                            </ul>
+
+                            <h4 className="font-semibold mt-3">Exercise</h4>
+                            <ul className="list-disc ml-5 text-sm text-gray-700">
+                              {healthAdvice[result.message].exercise.map(
+                                (tip, i) => (
+                                  <li key={i}>{tip}</li>
+                                )
+                              )}
+                            </ul>
+
+                            <h4 className="font-semibold mt-3">Lifestyle</h4>
+                            <ul className="list-disc ml-5 text-sm text-gray-700">
+                              {healthAdvice[result.message].lifestyle.map(
+                                (tip, i) => (
+                                  <li key={i}>{tip}</li>
+                                )
+                              )}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
                     </span>
                   </div>
                 ) : (
@@ -573,30 +660,62 @@ export default function FormInput() {
                     This assessment indicates a lower risk of diabetes. Continue
                     maintaining a healthy lifestyle and regular check-ups with
                     your healthcare provider.
+                    <div className="mt-4">
+                      <PDFDownloadLink
+                        document={
+                          <ResultPDF
+                            values={form.getValues()}
+                            result={result}
+                          />
+                        }
+                        fileName="diabetes_risk_assessment.pdf"
+                        style={{
+                          padding: "10px 20px",
+                          border: "1px solid #D1D5DB",
+                          backgroundColor: "white",
+                          color: "black",
+                          borderRadius: "8px",
+                          textDecoration: "none",
+                          display: "inline-block",
+                        }}
+                      >
+                        {({ loading }) =>
+                          loading ? "Generating Report..." : "Download Report"
+                        }
+                      </PDFDownloadLink>
+                    </div>
                     {result && (
-                      <div className="mt-4">
-                        <PDFDownloadLink
-                          document={
-                            <ResultPDF
-                              values={form.getValues()}
-                              result={result}
-                            />
-                          }
-                          fileName="diabetes_risk_assessment.pdf"
-                          style={{
-                            padding: "10px 20px",
-                            border: "1px solid #D1D5DB",
-                            backgroundColor: "white",
-                            color: "black",
-                            borderRadius: "8px",
-                            textDecoration: "none",
-                            display: "inline-block",
-                          }}
-                        >
-                          {({ loading }) =>
-                            loading ? "Generating PDF..." : "Download PDF"
-                          }
-                        </PDFDownloadLink>
+                      <div className="mt-6 p-4  rounded-lg ">
+                        <h3 className="text-lg font-semibold mb-2">
+                          {healthAdvice[result.message as ResultType].title}
+                        </h3>
+
+                        <h4 className="font-semibold mt-2">Diet</h4>
+                        <ul className="list-disc ml-5 text-sm text-gray-700">
+                          {healthAdvice[result.message as ResultType].diet.map(
+                            (tip, i) => (
+                              <li key={i}>{tip}</li>
+                            )
+                          )}
+                        </ul>
+
+                        <h4 className="font-semibold mt-3">Exercise</h4>
+                        <ul className="list-disc ml-5 text-sm text-gray-700">
+                          {healthAdvice[
+                            result.message as ResultType
+                          ].exercise.map((tip, i) => (
+                            <li key={i}>{tip}</li>
+                          ))}
+                        </ul>
+
+                        <h4 className="font-semibold mt-3">Lifestyle</h4>
+                        <ul className="list-disc ml-5 text-sm text-gray-700">
+                          {healthAdvice[
+                            result.message as ResultType
+                          ].lifestyle.map((tip, i) => (
+                            <li key={i}>{tip}</li>
+                          ))}
+                        </ul>
                       </div>
                     )}
                   </div>
